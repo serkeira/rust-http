@@ -1,8 +1,6 @@
-use std::fs;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::fs::File;
-use std::env;
 
 const SERVER_IP: &str = "127.0.0.1";
 const SERVER_PORT: &str = "8080";
@@ -22,16 +20,15 @@ fn handle_connection(mut stream: TcpStream) {
 
     stream.read(&mut buffer).unwrap();
 
-    // println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+    println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
 
     let mut response_file = File::open("./src/response.html").unwrap();
 
     let mut response_file_content = String::new();
     response_file.read_to_string(&mut response_file_content).unwrap();
 
-    let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n{}", response_file_content.len(), response_file_content);
-    println!("response ->>> {}", response);
+    let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}", response_file_content.len(), response_file_content);
 
-    stream.write_all(response.as_bytes()).unwrap();
+    stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 }
